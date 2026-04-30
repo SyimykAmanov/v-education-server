@@ -77,6 +77,18 @@ app.get("/subjects/:subjectId/lessons/:lessonId", async function(request, respon
     }
 });
 
+app.get("/faq", async function(request, response) {
+    try {
+        const result = await pool.query("SELECT * FROM faq");
+        const faq = result.rows;
+
+        response.json({faq: faq})
+    } catch (error) {
+        console.error(error)
+        response.status(500).json({ error: "Serverfehler" });
+    }
+});
+
 app.listen(3000, function() {
     console.log("Server listening on port 3000");
 });
