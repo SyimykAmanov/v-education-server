@@ -37,6 +37,16 @@ app.get("/subjects", async function(request, response) {
     }
 });
 
+app.get("/lessons", async function(request, response) {
+    try {
+        const result = await pool.query("SELECT * FROM lessons");
+        response.json({ lessons: result.rows });
+    } catch (error) {
+        console.error(error);
+        response.status(500).json({ error: "Serverfehler" });
+    }
+});
+
 
 app.get("/subjects/:subjectId", async function(request, response) {
     try {
