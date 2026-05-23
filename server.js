@@ -12,8 +12,24 @@ const pool = new Pool({
 });
 
 const app = express();
-
+app.use(express.json())
 app.use(cors())
+
+app.post("/lessons/:lessonId/reviews", async function(request, response) {
+    try {
+        const { lessonId } = request.params;
+        const { author_name, rating, text } = request.body;
+        let result = await pool.query("SELECT id FROM lessons where id=$1", [lessonId]);
+        if (result.rows.length === 0) {
+            return response.status(404).json({ error: "Lesson nicht gefunden" });
+        }
+        result = await pool.query(`INSERT INTO reviews (lesson_id, author_name, rating, text) VALUES ($1, $2, $3, $4) RETURNING *`, [lessonId, author_name, rating, text]);
+        response.status(201).json({ review: result.rows[0] });
+    } catch (error) {
+        console.error(error);
+        response.status(500).json({ error: "Serverfehler" });
+    }
+})
 
 app.get("/", function(request, response) {
     response.json({
