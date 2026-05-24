@@ -18,10 +18,16 @@ app.use(cors())
 app.post("/lessons/:lessonId/reviews", async function(request, response) {
     try {
         const { lessonId } = request.params;
-        const { author_name, rating, text } = request.body;
+        const { author_name, rating, text = "" } = request.body;
         let result = await pool.query("SELECT id FROM lessons where id=$1", [lessonId]);
         if (result.rows.length === 0) {
             return response.status(404).json({ error: "Lesson nicht gefunden" });
+        }
+        if (typeof rating !== "number" || rating > 5 || rating < 1) {
+            return response.status(400).json({error: "Rating ist falsch eingegeben"})
+        }
+        if (typeof author_name !== "string" || author_name === "" || author_name.length > 100) {
+            return response.status(400).json({error: "Name ist falsch eingegeben"})
         }
         result = await pool.query(`INSERT INTO reviews (lesson_id, author_name, rating, text) VALUES ($1, $2, $3, $4) RETURNING *`, [lessonId, author_name, rating, text]);
         response.status(201).json({ review: result.rows[0] });
