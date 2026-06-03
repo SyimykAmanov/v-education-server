@@ -35,7 +35,7 @@ app.post("/lessons/:lessonId/reviews", async function(request, response) {
         const { author_name, rating, text = "" } = request.body;
         let result = await pool.query("SELECT id FROM lessons where id=$1", [lessonId]);
         if (result.rows.length === 0) {
-            return response.status(404).json({ error: "Lesson nicht gefunden" });
+            return response.status(404).json({ error: "Die Lektion nicht gefunden" });
         }
         if (typeof rating !== "number" || rating > 5 || rating < 1) {
             return response.status(400).json({error: "Rating ist falsch eingegeben"})
