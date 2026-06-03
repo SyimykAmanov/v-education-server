@@ -40,7 +40,7 @@ app.post("/lessons/:lessonId/reviews", async function(request, response) {
         if (typeof rating !== "number" || rating > 5 || rating < 1) {
             return response.status(400).json({error: "Rating ist falsch eingegeben"})
         }
-        if (typeof author_name !== "string" || author_name === "" || author_name.length > 100) {
+        if (typeof author_name !== "string" || author_name.trim() === "" || author_name.length > 100) {
             return response.status(400).json({error: "Name ist falsch eingegeben"})
         }
         result = await pool.query(`INSERT INTO reviews (lesson_id, author_name, rating, text) VALUES ($1, $2, $3, $4) RETURNING *`, [lessonId, author_name, rating, text]);
