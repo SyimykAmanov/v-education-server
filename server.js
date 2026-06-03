@@ -14,7 +14,21 @@ const pool = new Pool({
 const app = express();
 app.use(express.json())
 app.use(cors())
-
+app.get("/lessons/:lessonId/reviews", async function(request, response) {
+    try {
+        const {lessonId} = request.params;
+        let result = await pool.query("SELECT id FROM lessons WHERE id=$1", [lessonId]);
+        if (result.rows.length === 0) {
+            return response.status(404).json({error: "Die Lektion nicht gefunden"})
+        }
+        result = await pool.query("SELECT * FROM reviews WHERE lesson_id=$1", [lessonId]);
+        response.status(200).json({reviews: result.rows});
+    } catch (error) {
+        console.error(error);
+        response.status(500).json({error: "Serverfehler"})
+    }
+}
+)
 app.post("/lessons/:lessonId/reviews", async function(request, response) {
     try {
         const { lessonId } = request.params;
